@@ -153,4 +153,3 @@ resource "aws_security_group" "cf_tcp_lb_internal_security_group" {
 
 #output "cf_tcp_lb_internal_security_group" { value = aws_security_group.cf_tcp_lb_internal_security_group.id }
 output "cf_tcp_lb_security_group"          { value = aws_security_group.cf_tcp_lb_security_group.id }
-}
