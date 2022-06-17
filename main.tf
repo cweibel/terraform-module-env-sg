@@ -86,3 +86,71 @@ resource "aws_security_group" "ocfp_env_bosh_sg" {
 output "ocfp_env_bosh_sg_id" {
     value = "${aws_security_group.ocfp_env_bosh_sg.id}"
 }
+
+
+resource "aws_security_group" "cf_tcp_lb_security_group" {
+  name        = "cf-tcp-lb-security-group"
+  description = "CF TCP"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    cidr_blocks = var.private_cidrs
+    protocol    = "tcp"
+    from_port   = 40000
+    to_port     = 40100
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = var.private_cidrs
+  }
+
+  tags = merge({Name = "cf-tcp-lb-security-group"}, var.resource_tags)
+
+  lifecycle {
+    ignore_changes = [name]
+  }
+}
+
+
+
+resource "aws_security_group" "cf_tcp_lb_internal_security_group" {
+  name        = "cf-tcp-lb-internal-security-group"
+  description = "CF TCP Internal"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    security_groups = ["${aws_security_group.cf_tcp_lb_security_group.id}"]
+    protocol        = "tcp"
+    from_port       = 40000
+    to_port         = 40100
+  }
+
+  ingress {
+    security_groups = ["${aws_security_group.cf_tcp_lb_security_group.id}"]
+    protocol        = "tcp"
+    from_port       = 80
+    to_port         = 80
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = var.private_cidrs
+  }
+
+  tags = merge({Name = "cf-tcp-lb-internal-security-group"}, var.resource_tags)
+
+
+  lifecycle {
+    ignore_changes = [name]
+  }
+}
+
+
+#output "cf_tcp_lb_internal_security_group" { value = aws_security_group.cf_tcp_lb_internal_security_group.id }
+output "cf_tcp_lb_security_group"          { value = aws_security_group.cf_tcp_lb_security_group.id }
+}

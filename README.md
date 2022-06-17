@@ -18,3 +18,4 @@ Inputs - Optional:
 Outputs:
 
  - `ocfp_env_bosh_sg_id` - security group id for bosh & deployments
+ - `cf_tcp_lb_security_group` - security group id for tcp routing lb
